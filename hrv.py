@@ -35,9 +35,9 @@ def calculate_HRV_metrics(file_in):
         results['mean_nn'] = round(df['rr'].mean()) if df['rr'].shape[0] >= 500 else None
         results['mean_bpm'] = round(60000 / results['mean_nn'], 1) if df['rr'].shape[0] >= 500 else None
         results['sdnn'] = round(df[df['rr_type'] == 'NN']['rr'].std(),1) if df['rr'].shape[0] >= 500 else None
-        results['rmssd'] = round(np.sqrt(df.loc[df['rr_type'] == 'NN','diff_squared'].mean()),1) if df.loc[df['rr_type'] == 'NN','diff_squared'].shape[0] >= 500 else None
-        results['pnn20'] = round((np.abs(df.loc[df['rr_type']=='NN','diff'])>20).sum()/(results['n']-1)*100,1) if df.loc[df['rr_type']=='NN','diff'].shape[0] >= 500 and df.shape[0] >= 500 else None
-        results['pnn50'] = round((np.abs(df.loc[df['rr_type']=='NN','diff'])>50).sum()/(results['n']-1)*100,1) if df.loc[df['rr_type']=='NN','diff'].shape[0] >= 500 and df.shape[0] >= 500 else None
+        results['rmssd'] = round(np.sqrt(df.loc[(df['rr_type'] =='NN') & (df['rr_type'].shift(-1) == 'NN'),'diff_squared'].mean()),1) if df.loc[(df['rr_type'] =='NN') & (df['rr_type'].shift(-1) == 'NN'),'diff_squared'].shape[0] >= 500 else None
+        results['pnn20'] = round((np.abs(df.loc[(df['rr_type'] =='NN') & (df['rr_type'].shift(-1) == 'NN'),'diff'])>20).sum()/(results['n']-1)*100,1) if df.loc[(df['rr_type'] =='NN') & (df['rr_type'].shift(-1) == 'NN'),'diff'].shape[0] >= 500 and df.shape[0] >= 500 else None
+        results['pnn50'] = round((np.abs(df.loc[(df['rr_type'] =='NN') & (df['rr_type'].shift(-1) == 'NN'),'diff'])>50).sum()/(results['n']-1)*100,1) if df.loc[(df['rr_type'] =='NN') & (df['rr_type'].shift(-1) == 'NN'),'diff'].shape[0] >= 500 and df.shape[0] >= 500 else None
 
         return results
     except FileNotFoundError:
@@ -65,3 +65,5 @@ def process_HRV_files(file_list_in, file_out):
     except Exception as e:
             print(e)
     return file_out
+
+print(calculate_HRV_metrics('investigating_hrv_dataset/y01.csv'))
